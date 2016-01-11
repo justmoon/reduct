@@ -152,6 +152,8 @@ this.xmlHttpRequest = deps(XMLHTTPRequest)
 
 > **Tip:** Keep in mind that using the shorthand breaks the basic injector pattern, so avoid it in libraries.
 
+> **Warning:** Using the shorthand syntax means that a change in the class name will break your code. I recommend only using shorthand when instantiating classes from the same module.
+
 ### Using reduct as a default injector
 
 When writing a library you can easily use reduct as a default injector:
