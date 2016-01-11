@@ -1,6 +1,6 @@
 {
   "name": "reduct",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Functional Dependency Injection (DI) for JavaScript",
   "main": "index.js",
   "dependencies": {},
