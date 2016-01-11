@@ -50,7 +50,7 @@ import _ from 'lodash'
 
 // Use ES6 Map to ensure keys meet strict equality (rather than string coercion)
 _.memoize.Cache = Map
-const injector = _.memoize(Constructor => new Constructor)
+const injector = _.memoize(Constructor => new Constructor(injector))
 ```
 
 That's basically it. `reduct` does this for you and adds some conveniences which are described below.
