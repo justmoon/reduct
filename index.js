@@ -3,14 +3,18 @@
 const util = require('./util')
 
 module.exports = function createReduct (Constructor, parent) {
+  let parentInjector
   // Convenience: If a Map is passed as a parent injector, convert it
-  if (parent instanceof Map) parent = key => parent.get(key)
+  if (parent instanceof Map) parentInjector = key => parent.get(key)
   // Convenience: If an object is passed as a parent injector, convert it
-  else if (typeof parent === 'object') parent = key => parent[key.name]
+  else if (typeof parent === 'object') parentInjector = key => parent[key.name]
+  else if (typeof parent === 'function') parentInjector = parent
+  else if (typeof parent === 'undefined') parentInjector = false
+  else throw new TypeError('Parent injector must be a Map, object or function')
 
   const getDependency = util.memoize((Constructor) => {
     // If there is a parent injector, query it first
-    const instanceFromParent = parent ? parent(Constructor) : null
+    const instanceFromParent = parentInjector ? parentInjector(Constructor) : null
     if (instanceFromParent) return instanceFromParent
 
     // Otherwise return a new instance
@@ -32,7 +36,7 @@ module.exports = function createReduct (Constructor, parent) {
         const targetName = util.toMixedCase(Constructor.name)
         context[targetName] = getDependency(Constructor)
       }
-    }
+    } else throw TypeError('Injector expected a constructor')
   }
 
   // If called without arguments, just return the injector
