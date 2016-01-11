@@ -84,15 +84,13 @@ console.log(a instanceof A) // => true
 
 You can pass another injector to `reduct` which will be consulted first. Only if this parent injector returns a falsy value will `reduct` attempt to construct the object itself.
 
-If you need to override something for a test, you can use a parent injector:
+Here is an example of a parent injector:
 
 ``` js
-const depMap = new Map()
-depMap.set(Database, new MockDatabase)
-const app = reduct(App, ::depMap.get)
+const app = reduct(App, (Constructor) => console.log(Constructor.name))
 ```
 
-> **Tip:** `::depMap.get` is ES7 syntax for `depMap.get.bind(depMap)`
+Since the parent injector will always be called when `reduct` tries to instantiate a class and because `console.log` always returns `undefined`, this will simply log all classes' names before instantiation.
 
 As a convenience, `reduct` will automatically convert Maps and objects into injector functions:
 
@@ -100,13 +98,15 @@ As a convenience, `reduct` will automatically convert Maps and objects into inje
 const app = reduct(App, { Database: CustomDatabase })
 ```
 
-> **Note:** Objects use string keys, meaning the above will override all classes with the name `'Database'`. If you only want to override a specific class (by reference instead of by name), use a `Map`:
+This is great for mocking/overriding specific classes in unit tests.
 
-``` js
-const depMap = new Map()
-depMap.set(Database, new MockDatabase())
-const app = reduct(App, depMap)
-```
+> **Note:** Objects use string keys, meaning the above will override all classes with the name `'Database'`. If you only want to override a specific class (by reference instead of by name), use a `Map`:
+>
+> ``` js
+> const depMap = new Map()
+> depMap.set(Database, new MockDatabase())
+> const app = reduct(App, depMap)
+> ```
 
 ### Shorthand
 
