@@ -20,7 +20,7 @@ function memoize (func, cache) {
 }
 
 function isUpperCase (subject) {
-  return subject && subject.toUpperCase() === subject
+  return typeof subject === 'string' && subject.toUpperCase() === subject
 }
 
 function toMixedCase (name) {
@@ -28,9 +28,10 @@ function toMixedCase (name) {
 
   let i = 0
   do {
-    name = name[0].toLowerCase() + name.slice(1)
+    name = name.slice(0, i) + name[i].toLowerCase() + name.slice(i + 1)
     i++
-  } while (isUpperCase(name[i]) && isUpperCase(name[i + 1]))
+  } while (isUpperCase(name[i]) &&
+           name[i + 1] === undefined || isUpperCase(name[i + 1]))
 
   return name
 }
