@@ -1,0 +1,35 @@
+{
+  "name": "reduct",
+  "version": "0.0.0",
+  "description": "Functional Dependency Injection (DI) for JavaScript",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "test": "node example"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/justmoon/reduct.git"
+  },
+  "keywords": [
+    "dependency",
+    "injection",
+    "di",
+    "inversion",
+    "of",
+    "control",
+    "ioc",
+    "simplicity",
+    "functional",
+    "dependencies",
+    "instantiation",
+    "classes"
+  ],
+  "author": "Stefan Thomas <justmoon@members.fsf.org>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/justmoon/reduct/issues"
+  },
+  "homepage": "https://github.com/justmoon/reduct#readme"
+}
