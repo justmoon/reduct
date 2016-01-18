@@ -217,4 +217,4 @@ console.log(a === a.b.a) // => true
 
 > **Tip:** You could use this feature to create database models that have mutual relations.
 
-> **Caution:** You can have two classes depend on each other symmetrically like the example above or you can have only one of them use a post-constructor.
+> **Caution:** You can have two classes depend on each other symmetrically like the example above or you can have only one of them use a post-constructor. However, in the asymmetric case, the class without a post-constructor must be instantiated first.
