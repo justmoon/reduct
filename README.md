@@ -53,7 +53,7 @@ _.memoize.Cache = Map
 const injector = _.memoize(Constructor => new Constructor(injector))
 ```
 
-That's basically it. `reduct` does this for you and adds some conveniences which are described below.
+That's it. `reduct` has a few more features than this minimalist injector which are described below.
 
 ## Usage
 
@@ -183,3 +183,38 @@ class AwesomeLibraryClass {
   }
 }
 ```
+
+### Circular references
+
+Dependency injection makes circular references more explicit and therefore safer than vanilla ES6 or CommonJS.
+
+If two classes depend on each other, you can define a method to be executed right after the constructor. Any class you depend on within the post-constructor can be successfully instantiated even if it depends on your class, because your class is already cached at this point.
+
+You can register a post-constructor using `deps.later`. Post-constructors will be executed synchronously immediately after the constructor and before your instance is returned to whoever requested it.
+
+> **Caution:** Other classes may interact with your class in their constructor (or post-constructor) before your post-constructor has completed, but only in their constructor and only if your post-constructor directly or indirectly depended on them.
+
+``` js
+class A {
+  constructor (deps) {
+    deps.later(() => {
+      this.b = deps(B)
+    })
+  }
+}
+
+class B {
+  constructor (deps) {
+    deps.later(() => {
+      this.a = deps(A)
+    })
+  }
+}
+
+const a = reduct(A)
+console.log(a === a.b.a) // => true
+```
+
+> **Tip:** You could use this feature to create database models that have mutual relations.
+
+> **Caution:** You can have two classes depend on each other symmetrically like the example above or you can have only one of them use a post-constructor.

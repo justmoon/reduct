@@ -115,4 +115,89 @@ describe('reduct', function () {
       reduct(C)
     }, /Injector expected a constructor/)
   })
+
+  it('should return a mapped instance even if it is the main instance requested', function () {
+    const map = new Map()
+    map.set(A, new B())
+    const b = reduct(A, map)
+    assert.instanceOf(b, B)
+  })
+
+  it('should throw in case of a circular reference', function () {
+    class C {
+      constructor (deps) {
+        this.d = deps(D)
+      }
+    }
+
+    class D {
+      constructor (deps) {
+        this.c = deps(C)
+      }
+    }
+
+    assert.throws(function () {
+      reduct(C)
+    }, /Circular dependency detected: C => D => C/)
+  })
+
+  it('should allow circular references using .later() - asymmetric', function () {
+    class C {
+      constructor (deps) {
+        deps.later(() => {
+          this.d = deps(D)
+        })
+      }
+    }
+
+    class D {
+      constructor (deps) {
+        this.c = deps(C)
+      }
+    }
+
+    const c = reduct(C)
+
+    assert.throws(function () {
+      reduct(D)
+    }, /Circular dependency detected: D => C \(post\) => D/)
+
+    assert.instanceOf(c, C)
+    assert.instanceOf(c.d, D)
+    assert.strictEqual(c.d.c, c)
+  })
+
+  it('should allow circular references using .later() - symmetric', function () {
+    class C {
+      constructor (deps) {
+        deps.later(() => {
+          this.d = deps(D)
+        })
+      }
+    }
+
+    class D {
+      constructor (deps) {
+        deps.later(() => {
+          this.c = deps(C)
+        })
+      }
+    }
+
+    const c = reduct(C)
+    const d = reduct(D)
+
+    assert.instanceOf(c, C)
+    assert.instanceOf(c.d, D)
+    assert.strictEqual(c.d.c, c)
+    assert.instanceOf(d, D)
+    assert.instanceOf(d.c, C)
+    assert.strictEqual(d.c.d, d)
+  })
+
+  it('should throw if we try to construct something that is not a function', function () {
+    assert.throws(() => {
+      reduct({})
+    }, /Dependencies must be constructors\/factories, but got: object/)
+  })
 })

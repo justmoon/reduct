@@ -1,24 +1,5 @@
 'use strict'
 
-function memoize (func, cache) {
-  if (typeof func !== 'function') {
-    throw new TypeError('Expected a function')
-  }
-
-  cache = cache || new Map()
-
-  var memoized = function (key) {
-    if (cache.has(key)) {
-      return cache.get(key)
-    }
-    var result = func.call(this, key)
-    memoized.cache = cache.set(key, result)
-    return result
-  }
-
-  return memoized
-}
-
 function isUpperCase (subject) {
   return typeof subject === 'string' && subject.toUpperCase() === subject
 }
@@ -36,8 +17,27 @@ function toMixedCase (name) {
   return name
 }
 
+function convertSetToArray (set) {
+  const arr = []
+  for (let v of set) {
+    arr.push(v)
+  }
+  return arr
+}
+
+function isClass (candidate) {
+  return typeof candidate === 'function' && /^\s*class\s+/.test(candidate.toString())
+}
+
+function printPrettyConstructor (key) {
+  if (typeof key === 'string') return key
+  return key.name || (isClass(key) ? '[anonymous class]' : '[anonymous fn]')
+}
+
 Object.assign(exports, {
-  memoize,
   isUpperCase,
-  toMixedCase
+  toMixedCase,
+  convertSetToArray,
+  isClass,
+  printPrettyConstructor
 })

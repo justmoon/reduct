@@ -4,46 +4,6 @@ const util = require('..').util
 const assert = require('chai').assert
 
 describe('util', function () {
-  describe('memoize', function () {
-    class A {}
-    class B {}
-
-    beforeEach(function () {
-      let unique = 0
-      const makeUnique = key => key.name + unique++
-      this.fn = util.memoize(makeUnique)
-    })
-
-    it('should return the same value if called twice using a function as a key', function () {
-      const first = this.fn(A)
-      const second = this.fn(A)
-      assert.strictEqual(first, 'A0')
-      assert.strictEqual(second, 'A0')
-    })
-
-    it('should return a different value if called twice using two different functions as the key', function () {
-      const first = this.fn(A)
-      const second = this.fn(B)
-      assert.strictEqual(first, 'A0')
-      assert.strictEqual(second, 'B1')
-    })
-
-    it('should continue to return the memoized value after doing something else', function () {
-      const first = this.fn(A)
-      const second = this.fn(B)
-      const third = this.fn(A)
-      assert.strictEqual(first, 'A0')
-      assert.strictEqual(second, 'B1')
-      assert.strictEqual(third, 'A0')
-    })
-
-    it('should throw when given a non-function', function () {
-      assert.throws(function () {
-        util.memoize({})
-      }, /Expected a function/)
-    })
-  })
-
   describe('isUpperCase', function () {
     it('should return true for "A"', function () {
       assert.strictEqual(util.isUpperCase('A'), true)
@@ -109,6 +69,63 @@ describe('util', function () {
 
     it('should return "" for ""', function () {
       assert.strictEqual(util.toMixedCase(''), '')
+    })
+  })
+
+  describe('convertSetToArray', function () {
+    it('should return elements in order', function () {
+      const set = new Set()
+      set.add('a')
+      set.add(9)
+      set.add('boo')
+      set.add(util)
+
+      const arr = util.convertSetToArray(set)
+
+      assert.deepEqual(arr, ['a', 9, 'boo', util])
+    })
+  })
+
+  describe('printPrettyConstructor', function () {
+    it('should print classes by their name', function () {
+      class A {}
+
+      const pretty = util.printPrettyConstructor(A)
+
+      assert.isString(pretty)
+      assert.strictEqual(pretty, 'A')
+    })
+
+    it('should print functions by their name', function () {
+      function A () {}
+
+      const pretty = util.printPrettyConstructor(A)
+
+      assert.isString(pretty)
+      assert.strictEqual(pretty, 'A')
+    })
+
+    it('should print anonymous classes as [anonymous class]', function () {
+      const A = class {}
+
+      const pretty = util.printPrettyConstructor(A)
+
+      assert.isString(pretty)
+      assert.strictEqual(pretty, '[anonymous class]')
+    })
+
+    it('should print anonymous functions as [anonymous fn]', function () {
+      const A = function () {}
+
+      const pretty = util.printPrettyConstructor(A)
+
+      assert.isString(pretty)
+      assert.strictEqual(pretty, '[anonymous fn]')
+    })
+
+    it('should pass through any string', function () {
+      const echo = util.printPrettyConstructor('echo')
+      assert.strictEqual(echo, 'echo')
     })
   })
 })
