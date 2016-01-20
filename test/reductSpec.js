@@ -32,20 +32,6 @@ describe('reduct', function () {
     assert.notStrictEqual(instance1, instance2)
   })
 
-  it('should instantiate and assign dependencies when using shorthand syntax', function () {
-    class Shorthand {
-      constructor (deps) {
-        deps(this, A, B)
-      }
-    }
-
-    const shorthand = reduct(Shorthand)
-
-    assert.instanceOf(shorthand, Shorthand)
-    assert.instanceOf(shorthand.a, A)
-    assert.instanceOf(shorthand.b, B)
-  })
-
   it('should pass an injector to every constructor', function () {
     class C {
       constructor (deps) {
@@ -91,19 +77,6 @@ describe('reduct', function () {
     }, /Parent injector must be a Map, object or function/)
   })
 
-  it('should throw when using shorthand against an anonymous constructor', function () {
-    const E = function () {}
-    class Shorthand {
-      constructor (deps) {
-        deps(this, E)
-      }
-    }
-
-    assert.throws(function () {
-      reduct(Shorthand)
-    }, /Constructors must have a name when using reduct shorthand syntax/)
-  })
-
   it('should throw when an invalid value is passed to the injector', function () {
     class C {
       constructor (deps) {
@@ -113,7 +86,7 @@ describe('reduct', function () {
 
     assert.throws(function () {
       reduct(C)
-    }, /Injector expected a constructor/)
+    }, /Dependencies must be constructors\/factories, but got: boolean/)
   })
 
   it('should return a mapped instance even if it is the main instance requested', function () {

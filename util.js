@@ -1,22 +1,5 @@
 'use strict'
 
-function isUpperCase (subject) {
-  return typeof subject === 'string' && subject.toUpperCase() === subject
-}
-
-function toMixedCase (name) {
-  if (!name.length) return name
-
-  let i = 0
-  do {
-    name = name.slice(0, i) + name[i].toLowerCase() + name.slice(i + 1)
-    i++
-  } while (isUpperCase(name[i]) &&
-           name[i + 1] === undefined || isUpperCase(name[i + 1]))
-
-  return name
-}
-
 function convertSetToArray (set) {
   const arr = []
   for (let v of set) {
@@ -35,8 +18,6 @@ function printPrettyConstructor (key) {
 }
 
 Object.assign(exports, {
-  isUpperCase,
-  toMixedCase,
   convertSetToArray,
   isClass,
   printPrettyConstructor

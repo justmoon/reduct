@@ -16,7 +16,7 @@ module.exports = function createReduct (Constructor, parent) {
   let stack = new Set()
   let queue = []
 
-  const getDependency = (Constructor) => {
+  const reduct = (Constructor) => {
     if (typeof Constructor !== 'function') {
       throw new TypeError('Dependencies must be constructors/factories, but got: ' + typeof Constructor)
     }
@@ -50,30 +50,12 @@ module.exports = function createReduct (Constructor, parent) {
     return instance
   }
 
-  function reduct (context) {
-    if (typeof context === 'function') {
-      return getDependency(context)
-    } else if (typeof context === 'object') {
-      // Shorthand syntax: Loop over remaining arguments, instantiate them and
-      // assign them to the context using an auto-generated name.
-      const constructors = Array.prototype.slice.call(arguments, 1)
-
-      for (let Constructor of constructors) {
-        if (!Constructor.name) {
-          throw new Error('Constructors must have a name when using reduct shorthand syntax')
-        }
-        const targetName = util.toMixedCase(Constructor.name)
-        context[targetName] = getDependency(Constructor)
-      }
-    } else throw TypeError('Injector expected a constructor')
-  }
-
   reduct.later = (fn) => queue.push(fn)
 
   // If called without arguments, just return the injector
   if (!Constructor) return reduct
 
-  return getDependency(Constructor)
+  return reduct(Constructor)
 }
 
 module.exports.util = util

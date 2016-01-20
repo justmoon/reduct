@@ -11,15 +11,15 @@ class C {
 
 class B {
   constructor (deps) {
-    // Get dependencies using normal syntax
+    // Get dependencies
     this.c = deps(C)
   }
 }
 
 class A {
   constructor (deps) {
-    // Get dependencies using shorthand syntax
-    deps(this, B, C)
+    this.b = deps(B)
+    this.c = deps(C)
   }
 }
 

@@ -9,7 +9,7 @@
 
 > Functional Dependency Injection (DI) for JavaScript
 
-Reduct is a simple (~50 lines) caching, functional dependency injector. It lets you eliminate a lot of boilerplate from your code, simplifies mocking (without ugly `require` hacks) and allows you to run multiple instances of your app in the same process.
+Reduct is a simple (<100 lines) caching, functional dependency injector. It lets you eliminate a lot of boilerplate from your code, simplifies mocking (without ugly `require` hacks) and allows you to run multiple instances of your app in the same process.
 
 > **Trivia:** Reduct was inspired by [Redux](https://github.com/rackt/redux)' simplistic, functional approach.
 
@@ -107,52 +107,6 @@ This is great for mocking/overriding specific classes in unit tests.
 > depMap.set(Database, new MockDatabase())
 > const app = reduct(App, depMap)
 > ```
-
-### Shorthand
-
-In order to save you some typing, `reduct` also provides a shorthand syntax.
-
-Instead of this:
-
-``` js
-class Example {
-  constructor (deps) {
-    this.a = deps(A)
-    this.b = deps(B)
-    this.c = deps(C)
-  }
-}
-```
-
-You can also write:
-
-``` js
-class Example {
-  constructor (deps) {
-    deps(this, A, B, C)
-  }
-}
-```
-
-When using the shorthand, reduct will guess the name of the variable you want to set by taking the class name (presumably in `CamelCase`) and converting it to `mixedCase`. Here are some examples:
-
-* `Log` => `this.log`
-* `RequestRouter` => `this.requestRouter`
-* `DB` => `this.db`
-* `HTTPRequest` => `this.httpRequest`
-
-> **Caveat:** Unfortunately, it is impossible to distinguish two consecutive uppercase words in a `CamelCase` token, so `XMLHTTPRequest` becomes `xmlhttpRequest`.
-
-You can always override the name by using the normal injector syntax:
-
-``` js
-deps(this, Log, DB, RequestRouter)
-this.xmlHttpRequest = deps(XMLHTTPRequest)
-```
-
-> **Tip:** Keep in mind that using the shorthand breaks the basic injector pattern, so avoid it in libraries.
-
-> **Warning:** Using the shorthand syntax means that a change in the class name will break your code. I recommend only using shorthand when instantiating classes from the same module.
 
 ### Using reduct as a default injector
 
