@@ -46,11 +46,11 @@ const router = new Router(injector)
 But as-is, it won't cache any instances. So let's memoize it:
 
 ``` js
-import _ from 'lodash'
+import memoize from 'lodash/memoize'
 
 // Use ES6 Map to ensure keys meet strict equality (rather than string coercion)
-_.memoize.Cache = Map
-const injector = _.memoize(Constructor => new Constructor(injector))
+memoize.Cache = Map
+const injector = memoize(Constructor => new Constructor(injector))
 ```
 
 That's it. `reduct` has a few more features than this minimalist injector which are described below.
