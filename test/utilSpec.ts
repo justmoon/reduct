@@ -29,7 +29,7 @@ describe('util', function () {
     })
 
     it('should print functions by their name', function () {
-      function A () {}
+      function A () { return }
 
       const pretty = util.printPrettyConstructor(A)
 

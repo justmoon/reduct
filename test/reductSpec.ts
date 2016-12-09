@@ -1,7 +1,8 @@
 'use strict'
 
-const reduct = require('..')
-const assert = require('chai').assert
+import reduct = require('..')
+import chai = require('chai')
+const assert = chai.assert
 
 describe('reduct', function () {
   class A {}
@@ -34,17 +35,21 @@ describe('reduct', function () {
 
   it('should pass an injector to every constructor', function () {
     class C {
-      constructor (deps) {
+      b: B
+
+      constructor (deps: any) {
         this.b = deps(B)
       }
     }
     class D {
-      constructor (deps) {
+      c: C
+
+      constructor (deps: any) {
         this.c = deps(C)
       }
     }
 
-    const d = reduct(D)
+    const d = reduct()(D)
 
     assert.instanceOf(d, D)
     assert.instanceOf(d.c, C)
@@ -52,7 +57,7 @@ describe('reduct', function () {
   })
 
   it('should allow parent injectors', function () {
-    const injector = reduct(null, () => 'foobar')
+    const injector = reduct(() => 'foobar')
     const test = injector(A)
     assert.strictEqual(test, 'foobar')
   })
@@ -60,63 +65,78 @@ describe('reduct', function () {
   it('should allow maps as parent injectors', function () {
     const map = new Map()
     map.set(A, 'denied')
-    const injector = reduct(null, map)
+    const injector = reduct(map)
     assert.strictEqual(injector(A), 'denied')
     assert.instanceOf(injector(B), B)
   })
 
   it('should allow objects as parent injectors', function () {
-    const injector = reduct(null, {A: 'yolo'})
+    const injector = reduct({A: 'yolo'})
     assert.strictEqual(injector(A), 'yolo')
     assert.instanceOf(injector(B), B)
   })
 
   it('should throw when passed an invalid value as a parent injector', function () {
-    assert.throws(function () {
-      reduct(null, true)
-    }, /Parent injector must be a Map, object or function/)
+    assert.throws(
+      function() {
+      reduct(true)
+      },
+      /Parent injector must be a Map, object or function/
+    )
   })
 
   it('should throw when an invalid value is passed to the injector', function () {
     class C {
-      constructor (deps) {
+      constructor (deps: any) {
         deps(false)
       }
     }
 
-    assert.throws(function () {
-      reduct(C)
-    }, /Dependencies must be constructors\/factories, but got: boolean/)
+    assert.throws(
+      function() {
+        reduct()(C)
+      },
+      /Dependencies must be constructors\/factories, but got: boolean/
+    )
   })
 
   it('should return a mapped instance even if it is the main instance requested', function () {
     const map = new Map()
     map.set(A, new B())
-    const b = reduct(A, map)
+    const b = reduct(map)(A)
     assert.instanceOf(b, B)
   })
 
   it('should throw in case of a circular reference', function () {
     class C {
-      constructor (deps) {
+      d: D
+
+      constructor (deps: any) {
         this.d = deps(D)
       }
     }
 
     class D {
-      constructor (deps) {
+      c: C
+
+      constructor (deps: any) {
         this.c = deps(C)
       }
     }
 
-    assert.throws(function () {
-      reduct(C)
-    }, /Circular dependency detected: C => D => C/)
+    assert.throws(
+      function() {
+        reduct()(C)
+      },
+      /Circular dependency detected: C => D => C/
+    )
   })
 
   it('should allow circular references using .later() - asymmetric', function () {
     class C {
-      constructor (deps) {
+      d: D
+
+      constructor (deps: any) {
         deps.later(() => {
           this.d = deps(D)
         })
@@ -124,16 +144,21 @@ describe('reduct', function () {
     }
 
     class D {
-      constructor (deps) {
+      c: C
+
+      constructor (deps: any) {
         this.c = deps(C)
       }
     }
 
-    const c = reduct(C)
+    const c = reduct()(C)
 
-    assert.throws(function () {
-      reduct(D)
-    }, /Circular dependency detected: D => C \(post\) => D/)
+    assert.throws(
+      function() {
+        reduct()(D)
+      },
+      /Circular dependency detected: D => C \(post\) => D/
+    )
 
     assert.instanceOf(c, C)
     assert.instanceOf(c.d, D)
@@ -142,7 +167,9 @@ describe('reduct', function () {
 
   it('should allow circular references using .later() - symmetric', function () {
     class C {
-      constructor (deps) {
+      d: D
+
+      constructor (deps: any) {
         deps.later(() => {
           this.d = deps(D)
         })
@@ -150,15 +177,17 @@ describe('reduct', function () {
     }
 
     class D {
-      constructor (deps) {
+      c: C
+
+      constructor (deps: any) {
         deps.later(() => {
           this.c = deps(C)
         })
       }
     }
 
-    const c = reduct(C)
-    const d = reduct(D)
+    const c = reduct()(C)
+    const d = reduct()(D)
 
     assert.instanceOf(c, C)
     assert.instanceOf(c.d, D)
@@ -169,8 +198,11 @@ describe('reduct', function () {
   })
 
   it('should throw if we try to construct something that is not a function', function () {
-    assert.throws(() => {
-      reduct({})
-    }, /Dependencies must be constructors\/factories, but got: object/)
+    assert.throws(
+      () => {
+        reduct()({} as any)
+      },
+      /Dependencies must be constructors\/factories, but got: object/
+    )
   })
 })
