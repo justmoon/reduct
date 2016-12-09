@@ -38,18 +38,16 @@ describe('util', function () {
     })
 
     it('should print anonymous classes as [anonymous class]', function () {
-      const A = class {}
-
-      const pretty = util.printPrettyConstructor(A)
+      const pretty = util.printPrettyConstructor(
+        class {}
+      )
 
       assert.isString(pretty)
       assert.strictEqual(pretty, '[anonymous class]')
     })
 
     it('should print anonymous functions as [anonymous fn]', function () {
-      const A = function () {}
-
-      const pretty = util.printPrettyConstructor(A)
+      const pretty = util.printPrettyConstructor(function () {})
 
       assert.isString(pretty)
       assert.strictEqual(pretty, '[anonymous fn]')
