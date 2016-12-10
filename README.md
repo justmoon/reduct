@@ -69,14 +69,14 @@ const injector = reduct()
 
 ### Constructing objects
 
-If you call `reduct(Constructor)`, `reduct` will create a new injector and pass it to the `Constructor`. Then, it will return the new instance of `Constructor`.
+If you call `reduct()(Constructor)`, `reduct` will create a new injector and pass it to the `Constructor`. Then, it will return the new instance of `Constructor`.
 
 ``` js
 import reduct from 'reduct'
 
 class A {}
 
-const a = reduct(A)
+const a = reduct()(A)
 console.log(a instanceof A) // => true
 ```
 
@@ -87,7 +87,7 @@ You can pass another injector to `reduct` which will be consulted first. Only if
 Here is an example of a parent injector:
 
 ``` js
-const app = reduct(App, (Constructor) => console.log(Constructor.name))
+const app = reduct(Constructor => console.log(Constructor.name))(App)
 ```
 
 Since the parent injector will always be called when `reduct` tries to instantiate a class and because `console.log` always returns `undefined`, this will simply log all classes' names before instantiation.
@@ -95,17 +95,17 @@ Since the parent injector will always be called when `reduct` tries to instantia
 As a convenience, `reduct` will automatically convert Maps and objects into injector functions:
 
 ``` js
-const app = reduct(App, { Database: CustomDatabase })
+const app = reduct({ Database: CustomDatabase })(App)
 ```
 
 This is great for mocking/overriding specific classes in unit tests.
 
-> **Note:** Objects use string keys, meaning the above will override all classes with the name `'Database'`. If you only want to override a specific class (by reference instead of by name), use a `Map`:
+> **Note:** Objects use string keys, meaning the above will override all classes with the name `'Database'`. It's also brittle and will break when minified. If you want to override a class by reference instead of by name, use a `Map`:
 >
 > ``` js
 > const depMap = new Map()
 > depMap.set(Database, new MockDatabase())
-> const app = reduct(App, depMap)
+> const app = reduct(depMap)(App)
 > ```
 
 ### Using reduct as a default injector
@@ -165,10 +165,14 @@ class B {
   }
 }
 
-const a = reduct(A)
+const a = reduct()(A)
 console.log(a === a.b.a) // => true
 ```
 
 > **Tip:** You could use this feature to create database models that have mutual relations.
 
 > **Caution:** You can have two classes depend on each other symmetrically like the example above or you can have only one of them use a post-constructor. However, in the asymmetric case, the class without a post-constructor must be instantiated last.
+
+### Migrating from an older version
+
+Please see [MIGRATING.md](docs/MIGRATING.md).
