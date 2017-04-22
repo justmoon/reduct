@@ -107,6 +107,28 @@ describe('reduct', function () {
     assert.instanceOf(b, B)
   })
 
+  it('should return instances of override class', function () {
+    // Your app code
+    class Database {}
+
+    class App {
+      database: any
+
+      constructor (deps: any) {
+        this.database = deps(Database)
+      }
+    }
+
+    // Your test code
+    class MockDatabase {}
+
+    const deps = reduct()
+    deps.setOverride(Database, MockDatabase)
+    const app = deps(App)
+    assert.instanceOf(app, App)
+    assert.instanceOf(app.database, MockDatabase)
+  })
+
   it('should throw in case of a circular reference', function () {
     class C {
       d: D

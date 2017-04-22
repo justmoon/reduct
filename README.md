@@ -69,7 +69,7 @@ const injector = reduct()
 
 ### Constructing objects
 
-If you call `reduct()(Constructor)`, `reduct` will create a new injector and pass it to the `Constructor`. Then, it will return the new instance of `Constructor`.
+If you call `reduct()(A)`, `reduct` will create a new injector and construct an instance of `A`. Whenever an injector constructs an object, it passes itself as the first and only parameter. In this case, there is no constructor, so the object is simply instantiated and returned.
 
 ``` js
 import reduct from 'reduct'
@@ -79,6 +79,54 @@ class A {}
 const a = reduct()(A)
 console.log(a instanceof A) // => true
 ```
+
+When an class does have dependencies, it's easy to retrieve them by calling the injector (usually called `deps`). The injector will automatically create instances of any classes that it hasn't instantiated before.
+
+``` js
+import reduct from 'reduct'
+
+class A {}
+class B {
+  constructor (deps) {
+    const a = deps(A)
+
+    console.log(a instanceof A) // => true
+  }
+}
+
+const b = reduct()(B)
+console.log(b instance of B) // => true
+```
+
+### Override classes
+
+For testing it's often useful to override a specific class with another (mock) class. This can be achieved by calling the `setOverride` method on the injector.
+
+For example:
+
+``` js
+import reduct from 'reduct'
+
+// Your app code
+class Database {}
+
+class App {
+  constructor (deps) {
+    this.database = deps(Database)
+  }
+}
+
+// Your test code
+class MockDatabase {}
+
+const deps = reduct()
+deps.setOverride(Database, MockDatabase)
+const app = deps(App)
+
+console.log(app.database.constructor.name) // => 'MockDatabase'
+```
+
+Note that override classes can have dependencies like any other class.
 
 ### Parent injectors
 
