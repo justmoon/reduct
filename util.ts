@@ -17,7 +17,7 @@ function printPrettyConstructor (key: string | Function) {
   return key.name || (isClass(key) ? '[anonymous class]' : '[anonymous fn]')
 }
 
-export = {
+export {
   convertSetToArray,
   isClass,
   printPrettyConstructor

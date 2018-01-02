@@ -1,27 +1,30 @@
-'use strict'
+import * as utility from './util'
+import {
+  IConstructor,
+  IInjector,
+  IInjectorPartial,
+  IInstanceMap
+} from './interfaces/injector'
 
-import utility = require('./util')
-import { IConstructor, IInjector, IInjectorPartial } from './interfaces/injector'
-
-function createReduct (
-  parent?: IInjector | Map<IConstructor, Object> | Object
+function createContainer (
+  parent?: IInjector | IInstanceMap | Object
 ): IInjector {
   let parentInjector: IInjectorPartial
   // Convenience: If a Map is passed as a parent injector, convert it
   if (parent instanceof Map) {
-    parentInjector = (key: IConstructor) => parent.get(key)
+    parentInjector = key => parent.get(key)
   // Convenience: If an object is passed as a parent injector, convert it
   } else if (typeof parent === 'object') {
-    parentInjector = (key: IConstructor) => parent[key.name]
+    parentInjector = key => parent[key.name]
   } else if (typeof parent === 'function') {
     parentInjector = parent
   } else if (typeof parent === 'undefined') {
-    parentInjector = () => false
+    parentInjector = () => undefined
   } else {
     throw new TypeError('Parent injector must be a Map, object or function')
   }
 
-  const cache: Map<IConstructor, Object> = new Map()
+  const cache: IInstanceMap = new Map()
   const mapping: Map<IConstructor, IConstructor> = new Map()
   let stack: Set<string | Function> = new Set()
   let queue: Function[] = []
@@ -52,7 +55,7 @@ function createReduct (
     stack.add(Constructor)
 
     const instance =
-      parentInjector(Constructor) ||   // Then try the parent injector
+      parentInjector(Constructor) ||   // Then try the parent SinjectorS
       construct(Constructor)           // Finally, construct a new instance
 
     stack.delete(Constructor)
@@ -79,8 +82,14 @@ function createReduct (
   return reduct as IInjector
 }
 
-namespace createReduct {
+export = createContainer
+
+namespace createContainer {
   export let util = utility
 }
 
-export = createReduct
+declare namespace createContainer {
+  export type Constructor = IConstructor
+  export type Injector = IInjector
+  export type InstanceMap = IInstanceMap
+}
