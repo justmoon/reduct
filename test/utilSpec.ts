@@ -47,7 +47,7 @@ describe('util', function () {
     })
 
     it('should print anonymous functions as [anonymous fn]', function () {
-      const pretty = util.printPrettyConstructor(function () {})
+      const pretty = util.printPrettyConstructor(function () { return })
 
       assert.isString(pretty)
       assert.strictEqual(pretty, '[anonymous fn]')

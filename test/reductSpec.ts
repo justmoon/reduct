@@ -71,15 +71,15 @@ describe('reduct', function () {
   })
 
   it('should allow objects as parent injectors', function () {
-    const injector = reduct({A: 'yolo'})
+    const injector = reduct({ A: 'yolo' })
     assert.strictEqual(injector(A), 'yolo')
     assert.instanceOf(injector(B), B)
   })
 
   it('should throw when passed an invalid value as a parent injector', function () {
     assert.throws(
-      function() {
-      reduct(true)
+      function () {
+        reduct(true)
       },
       /Parent injector must be a Map, object or function/
     )
@@ -93,7 +93,7 @@ describe('reduct', function () {
     }
 
     assert.throws(
-      function() {
+      function () {
         reduct()(C)
       },
       /Dependencies must be constructors\/factories, but got: boolean/
@@ -147,7 +147,7 @@ describe('reduct', function () {
     }
 
     assert.throws(
-      function() {
+      function () {
         reduct()(C)
       },
       /Circular dependency detected: C => D => C/
@@ -176,7 +176,7 @@ describe('reduct', function () {
     const c = reduct()(C)
 
     assert.throws(
-      function() {
+      function () {
         reduct()(D)
       },
       /Circular dependency detected: D => C \(post\) => D/

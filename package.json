@@ -10,23 +10,23 @@
   ],
   "dependencies": {},
   "devDependencies": {
-    "@types/chai": "^4.0.10",
+    "@types/chai": "^4.1.4",
     "@types/mocha": "^5.2.5",
     "@types/node": "10.5.6",
     "chai": "^4.1.2",
     "codecov.io": "^0.1.6",
-    "ghooks": "^2.0.2",
+    "ghooks": "^2.0.4",
     "mocha": "^5.2.0",
     "nyc": "^12.0.2",
     "ts-node": "^7.0.0",
-    "tslint": "^5.8.0",
-    "tslint-config-standard": "^7.0.0",
+    "tslint": "^5.11.0",
+    "tslint-config-standard": "^7.1.0",
     "typescript": "^3.0.1",
     "validate-commit-msg": "^2.14.0"
   },
   "scripts": {
     "build": "rm -rf dist/; tsc",
-    "lint": "tslint .",
+    "lint": "tslint --project .",
     "test": "npm run build; nyc _mocha",
     "codecov": "nyc report --reporter=lcov | codecov"
   },

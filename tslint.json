@@ -1,3 +1,8 @@
 {
-  "extends": "tslint-config-standard"
+  "extends": "tslint-config-standard",
+  "rules": {
+    "no-unused-variable": false,
+    "strict-type-predicates": false,
+    "no-use-before-declare": false
+  }
 }

@@ -27,7 +27,7 @@ interface MainExport {
   util: typeof utility
 }
 
-const createContainer = <MainExport>function (
+const createContainer = function (
   parent?: Injector | InstanceMap | Object
 ) {
   let parentInjector: InjectorPartial
@@ -76,7 +76,7 @@ const createContainer = <MainExport>function (
     stack.add(Constructor)
 
     const instance =
-      parentInjector(Constructor) ||   // Then try the parent SinjectorS
+      parentInjector(Constructor) ||   // Then try the parent injector
       construct(Constructor)           // Finally, construct a new instance
 
     stack.delete(Constructor)
@@ -101,7 +101,7 @@ const createContainer = <MainExport>function (
   reduct.later = (fn: Function) => queue.push(fn)
 
   return reduct as Injector
-}
+} as MainExport
 
 createContainer.default = createContainer
 createContainer.util = utility
