@@ -1,6 +1,6 @@
 'use strict'
 
-import reduct = require('..')
+import reduct from '..'
 import chai = require('chai')
 const assert = chai.assert
 

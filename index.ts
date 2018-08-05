@@ -1,15 +1,36 @@
 import * as utility from './util'
-import {
-  IConstructor,
-  IInjector,
-  IInjectorPartial,
-  IInstanceMap
-} from './interfaces/injector'
 
-function createContainer (
-  parent?: IInjector | IInstanceMap | Object
-): IInjector {
-  let parentInjector: IInjectorPartial
+export type Injector = {
+  <T>(Constructor: new(injector: Injector) => T): T
+  later: (fn: Function) => number
+  setOverride: (Constructor: Function, instance: any) => void
+}
+
+export type InjectorPartial = {
+  <T>(Constructor: new(injector: Injector) => T): (T | undefined)
+  later?: (fn: Function) => number
+  setOverride?: (Constructor: Function, instance: any) => void
+}
+
+export interface Constructor {
+  new (injector: Injector): Object
+}
+
+export interface InstanceMap extends Map<Constructor, any> {
+  get<T> (key: new(injector: Injector) => T): T | undefined
+  set<T> (key: new(injector: Injector) => T, value: T): this
+}
+
+interface MainExport {
+  (parent?: Injector | InstanceMap | Object): Injector
+  default: MainExport
+  util: typeof utility
+}
+
+const createContainer = <MainExport>function (
+  parent?: Injector | InstanceMap | Object
+) {
+  let parentInjector: InjectorPartial
   // Convenience: If a Map is passed as a parent injector, convert it
   if (parent instanceof Map) {
     parentInjector = key => parent.get(key)
@@ -24,17 +45,17 @@ function createContainer (
     throw new TypeError('Parent injector must be a Map, object or function')
   }
 
-  const cache: IInstanceMap = new Map()
-  const mapping: Map<IConstructor, IConstructor> = new Map()
+  const cache: InstanceMap = new Map()
+  const mapping: Map<Constructor, Constructor> = new Map()
   let stack: Set<string | Function> = new Set()
   let queue: Function[] = []
 
-  const construct = <T>(Constructor: new (injector: IInjector) => T): T => {
+  const construct = <T>(Constructor: new (injector: Injector) => T): T => {
     const OverrideConstructor = mapping.get(Constructor)
-    return new (OverrideConstructor || Constructor)(reduct as IInjector) as T
+    return new (OverrideConstructor || Constructor)(reduct as Injector) as T
   }
 
-  const reduct: IInjectorPartial = <T>(Constructor: new (injector: IInjector) => T): T => {
+  const reduct: InjectorPartial = <T>(Constructor: new (injector: Injector) => T): T => {
     if (typeof Constructor !== 'function') {
       throw new TypeError('Dependencies must be constructors/factories, but got: ' + typeof Constructor)
     }
@@ -74,22 +95,16 @@ function createContainer (
     return instance
   }
 
-  reduct.setOverride = (Constructor: IConstructor, OverrideConstructor: IConstructor) => {
+  reduct.setOverride = (Constructor: Constructor, OverrideConstructor: Constructor) => {
     mapping.set(Constructor, OverrideConstructor)
   }
   reduct.later = (fn: Function) => queue.push(fn)
 
-  return reduct as IInjector
+  return reduct as Injector
 }
 
-export = createContainer
+createContainer.default = createContainer
+createContainer.util = utility
+export default createContainer
 
-namespace createContainer {
-  export let util = utility
-}
-
-declare namespace createContainer {
-  export type Constructor = IConstructor
-  export type Injector = IInjector
-  export type InstanceMap = IInstanceMap
-}
+module.exports = createContainer
