@@ -24,6 +24,9 @@
     "typescript": "^3.0.1",
     "validate-commit-msg": "^2.14.0"
   },
+  "engines": {
+    "node": ">=5"
+  },
   "scripts": {
     "build": "rm -rf dist/; tsc",
     "lint": "tslint --project .",
